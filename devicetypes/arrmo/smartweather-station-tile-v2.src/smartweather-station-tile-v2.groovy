@@ -63,7 +63,7 @@ metadata {
 			state "default", label:'${currentValue}% humidity'
 		}
 
-		standardTile("weatherIcon", "device.weatherIcon", decoration: "flat") {
+		standardTile("weatherIcon", "device.weatherIcon", decoration: "flat", width: 2, height: 2) {
 			state "chanceflurries", icon:"st.custom.wu1.chanceflurries", label: ""
 			state "chancerain", icon:"st.custom.wu1.chancerain", label: ""
 			state "chancesleet", icon:"st.custom.wu1.chancesleet", label: ""
@@ -108,12 +108,15 @@ metadata {
 			state "nt_cloudy", icon:"st.custom.wu1.nt_cloudy", label: ""
 			state "nt_partlycloudy", icon:"st.custom.wu1.nt_partlycloudy", label: ""
 		}
-		valueTile("feelsLike", "device.feelsLike", decoration: "flat") {
+		valueTile("feelsLikeMain", "device.feelsLikeMain", decoration: "flat", width: 2, height: 2) {
 			state "default", label:'feels like ${currentValue}°', icon: "st.Weather.weather9-icn"
 		}
+		valueTile("feelsLikeDetails", "device.feelsLikeDetails", decoration: "flat") {
+			state "default", label:'feels like ${currentValue}°'
+		}
 
-		valueTile("wind", "device.wind", decoration: "flat") {
-			state "default", label:'wind ${currentValue} mph'
+		valueTile("wind", "device.wind", decoration: "flat", width: 4, height: 1) {
+			state "default", label:'wind ${currentValue}'
 		}
 
 		valueTile("weather", "device.weather", decoration: "flat") {
@@ -128,11 +131,19 @@ metadata {
 			state "default", label:'${currentValue}% precip'
 		}
 
+		valueTile("precipToday", "device.precipToday", decoration: "flat", width: 2, height: 1) {
+			state "default", label:'${currentValue}'
+		}
+
 		standardTile("refresh", "device.weather", decoration: "flat") {
 			state "default", label: "", action: "refresh", icon:"st.secondary.refresh"
 		}
 
 		valueTile("alert", "device.alert", width: 3, height: 1, decoration: "flat") {
+			state "default", label:'${currentValue}'
+		}
+
+		valueTile("uv", "device.uv", decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
 
@@ -148,8 +159,12 @@ metadata {
 			state "default", label:'${currentValue} lux'
 		}
 
-		main("feelsLike")
-		details(["temperature", "humidity", "weatherIcon","feelsLike","wind","weather", "city","percentPrecip", "refresh","alert","rise","set","light"])}
+		valueTile("updated", "device.updated", width: 2, height: 1, decoration: "flat") {
+			state "default", label:'${currentValue}'
+		}
+
+		main("feelsLikeMain")
+		details(["weatherIcon", "temperature", "weather", "feelsLikeDetails", "percentPrecip", "alert", "humidity", "wind", "precipToday", "updated", "refresh", "rise", "set", "light"])}
 }
 
 // parse events into attributes
@@ -176,22 +191,28 @@ def poll() {
 
 		if(getTemperatureScale() == "C") {
 			send(name: "temperature", value: Math.round(obs.temp_c), unit: "C")
-			send(name: "feelsLike", value: Math.round(obs.feelslike_c as Double), unit: "C")
+			send(name: "feelsLikeMain", value: Math.round(obs.feelslike_c as Double), unit: "C")
+			send(name: "feelsLikeDetails", value: Math.round(obs.feelslike_c as Double), unit: "C")
 		} else {
 			send(name: "temperature", value: Math.round(obs.temp_f), unit: "F")
-			send(name: "feelsLike", value: Math.round(obs.feelslike_f as Double), unit: "F")
+			send(name: "feelsLikeMain", value: Math.round(obs.feelslike_f as Double), unit: "F")
+			send(name: "feelsLikeDetails", value: Math.round(obs.feelslike_f as Double), unit: "F")
 		}
 		
 		send(name: "humidity", value: obs.relative_humidity[0..-2] as Integer, unit: "%")
 		send(name: "weather", value: obs.weather)
 		send(name: "weatherIcon", value: weatherIcon, displayed: false)
-		send(name: "wind", value: Math.round(obs.wind_mph) as String, unit: "MPH") // as String because of bug in determining state change of 0 numbers
+		//send(name: "wind", value: Math.round(obs.wind_mph) + " mph, " + obs.wind_dir, unit: "MPH") // as String because of bug in determining state change of 0 numbers
+		send(name: "wind", value: obs.wind_string) // as String because of bug in determining state change of 0 numbers
+		send(name: "uv", value: "UV " + obs.uv)
+		send(name: "updated", value: obs.observation_time)
+		send(name: "precipToday", value: obs.precip_today_string)
 
 		if (obs.local_tz_offset != device.currentValue("timeZoneOffset")) {
 			send(name: "timeZoneOffset", value: obs.local_tz_offset, isStateChange: true)
 		}
 
-		def cityValue = "${obs.display_location.city}, ${obs.display_location.state}"
+		def cityValue = "${obs.observation_location.city}, ${obs.display_location.state}"
 		if (cityValue != device.currentValue("city")) {
 			send(name: "city", value: cityValue, isStateChange: true)
 		}
