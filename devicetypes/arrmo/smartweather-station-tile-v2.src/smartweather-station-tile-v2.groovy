@@ -16,6 +16,8 @@
  *
  *  Date: 2013-04-30
  */
+//import groovy.json.*
+
 metadata {
 	definition (name: "SmartWeather Station Tile v2", namespace: "arrmo", author: "SmartThings") {
 		capability "Illuminance Measurement"
@@ -186,6 +188,7 @@ def poll() {
 
 	// Current conditions
 	def obs = get("conditions")?.current_observation
+    //log.debug "Observation, |${new JsonBuilder(obs)}"
 	if (obs) {
 		def weatherIcon = obs.icon_url.split("/")[-1].split("\\.")[0]
 
