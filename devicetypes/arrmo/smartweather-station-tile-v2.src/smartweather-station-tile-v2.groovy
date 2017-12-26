@@ -47,7 +47,7 @@ metadata {
 		input "zipCode", "text", title: "Zip Code (optional)", required: false
 	}
 
-	tiles (scale: 2) {
+	tiles (scale: 1) {
 		valueTile("temperature", "device.temperature") {
 			state "default", label:'${currentValue}°',
 				backgroundColors:[
@@ -65,7 +65,7 @@ metadata {
 			state "default", label:'${currentValue}% humidity'
 		}
 
-		standardTile("weatherIcon", "device.weatherIcon", decoration: "flat", width: 2, height: 2) {
+		standardTile("weatherIcon", "device.weatherIcon", decoration: "flat", width: 1, height: 1) {
 			state "chanceflurries", icon:"st.custom.wu1.chanceflurries", label: ""
 			state "chancerain", icon:"st.custom.wu1.chancerain", label: ""
 			state "chancesleet", icon:"st.custom.wu1.chancesleet", label: ""
@@ -110,14 +110,14 @@ metadata {
 			state "nt_cloudy", icon:"st.custom.wu1.nt_cloudy", label: ""
 			state "nt_partlycloudy", icon:"st.custom.wu1.nt_partlycloudy", label: ""
 		}
-		valueTile("feelsLikeMain", "device.feelsLikeMain", decoration: "flat", width: 2, height: 2) {
+		valueTile("feelsLikeMain", "device.feelsLikeMain", decoration: "flat", width: 1, height: 1) {
 			state "default", label:'feels like ${currentValue}°', icon: "st.Weather.weather9-icn"
 		}
 		valueTile("feelsLikeDetails", "device.feelsLikeDetails", decoration: "flat") {
 			state "default", label:'feels like ${currentValue}°'
 		}
 
-		valueTile("wind", "device.wind", decoration: "flat", width: 4, height: 1) {
+		valueTile("wind", "device.wind", decoration: "flat", width: 3, height: 1) {
 			state "default", label:'wind ${currentValue}'
 		}
 
@@ -161,12 +161,12 @@ metadata {
 			state "default", label:'${currentValue} lux'
 		}
 
-		valueTile("updated", "device.updated", width: 2, height: 1, decoration: "flat") {
+		valueTile("updated", "device.updated", width: 3, height: 1, decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
 
 		main("feelsLikeMain")
-		details(["weatherIcon", "temperature", "weather", "feelsLikeDetails", "percentPrecip", "alert", "humidity", "wind", "precipToday", "updated", "refresh", "rise", "set", "light"])}
+		details(["weatherIcon", "temperature", "weather", "feelsLikeDetails", "humidity", "percentPrecip", "wind", "alert", "precipToday", "updated", "refresh", "rise", "set", "light"])}
 }
 
 // parse events into attributes
